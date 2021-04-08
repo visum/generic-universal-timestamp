@@ -31,7 +31,6 @@ The first character identifies if the date expressed is before or after the meri
 A "<" character signifies a year before AD 1 on the Gregorian calendar, and a ">" indicates
 AD 1 or later.
 
-
 ## Pre-meridian years
 
 If a timestamp begins with "<", indicating a year before AD 1, the year is expressed
@@ -45,7 +44,6 @@ For example:
 | `<231,000,000,000` |  123 BC |
 | `<---,---,--8,310` |  13.8 Billion Years Ago (Age of Universe) |
 | `<---,209,152,000` |  251.902 Million Years Ago (Beginning of Triassic) |
-
 
 ## Post-meridian years
 

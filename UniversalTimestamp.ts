@@ -4,24 +4,35 @@ import blurNumber from "./lib/blurNumber";
 const regexp = /([<>])([\d~-]{3}),([\d~-]{3}),([\d~-]{3}),([\d~-]{3})\+([\d~-]{3})#([\d~-]{2}):([\d~-]{2}):([\d~-]{2})\.([\d~-]{4})/;
 
 type MeridianFlag = "<" | ">";
+type Precision = {year: number, day: number, hour: number, minute: number, second: number};
 
 export default class UniversalTimestamp {
-  _meridian: MeridianFlag;
-  _year: number;
-  _precision: {year: number, day: number, hour: number, minute: number, second: number};
-  _days: number;
-  _hours: number;
-  _minutes: number;
-  _seconds: number;
+  private _meridian: MeridianFlag;
+  private _years: number;
+  private _precision: Precision;
+  private _days: number;
+  private _hours: number;
+  private _minutes: number;
+  private _seconds: number;
+
+  constructor() {
+    this._precision = {
+      year: 0,
+      day: 0,
+      hour: 0,
+      minute: 0,
+      second: 0
+    };
+  }
 
   static validate(timestamp: UniversalTimestamp): boolean {
     // @TODO: validate
     return true;
   }
 
-  parse(input: string): UniversalTimestamp {
+  static parse(input: string): UniversalTimestamp {
     const matches = regexp.exec(input);
-    if (matches.length === 0) {
+    if (!matches) {
       throw new TypeError("Given string was not parseable as timestamp");
     }
 
@@ -39,9 +50,9 @@ export default class UniversalTimestamp {
       yearPrecision *= 10;
       char = normalizedYear[--index];
     }
-    const numericYearString = normalizedYear.replace(/[~-]+/g, "0");
+    const numericYearString = normalizedYear.replace(/[~-]/g, "0");
     timestamp._precision.year = yearPrecision;
-    timestamp._year = parseInt(numericYearString, 10);
+    timestamp._years = parseInt(numericYearString, 10);
 
     // day
     if(matches[6] === "~~~") {
@@ -76,7 +87,7 @@ export default class UniversalTimestamp {
     }
 
     // fractions of second
-    if(this._precision.second !== 0) {
+    if(timestamp._precision.second !== 0) {
       const milliseconds = matches[10];
       const msDigits = [];
       ([...milliseconds]).forEach(char => {
@@ -84,9 +95,11 @@ export default class UniversalTimestamp {
           msDigits.push("0");
         } else {
           msDigits.push(char);
-          timestamp._precision.second = this._precision.second / 10;
+          timestamp._precision.second = timestamp._precision.second / 10;
         }
       });
+      const fractionalSeconds = parseFloat("0." + msDigits.join(""));
+      timestamp._seconds += fractionalSeconds;
     }
     
     return timestamp;
@@ -95,16 +108,13 @@ export default class UniversalTimestamp {
   toString(): string {
     // year
     const placeholderChar = this._meridian === "<" ? "-" : "~";
-    let yearString = blurNumber(this._year, this._precision.year, placeholderChar);
+    let yearString = blurNumber(this._years, this._precision.year, placeholderChar);
     if (this._meridian === "<") {
       yearString = reverse(yearString);
     }
 
     // day
-    let dayString = "~~~";
-    if (this._precision.day === 1) {
-      dayString = this._days + "";
-    }
+    let dayString = blurNumber(this._days, this._precision.day);
     
     // hour
     let hourString = "~~";
@@ -119,18 +129,64 @@ export default class UniversalTimestamp {
     }
 
     // second
-    let secondString = "~~.~~~~";
-    if () {
-      
+    let secondString = blurNumber(this._seconds, this._precision.second);
+
+    return `${this._meridian}${yearString}+${dayString}#${hourString}:${minuteString}:${secondString}`;
+  }
+
+  get years(): number {
+    return this._years;
+  }
+
+  set years(value: number) {
+    this._years = value;
+  }
+
+  get precision(): Precision {
+    return this._precision;
+  }
+
+  get days(): number {
+    return this._days;
+  }
+
+  set days(value: number) {
+    this._days = value;
+  }
+
+  get hours(): number {
+    return this._hours;
+  }
+
+  set hours(value: number) {
+    this._hours = value;
+  }
+
+  get minutes(): number {
+    return this._minutes;
+  }
+
+  set minutes(value: number) {
+    this._minutes = value;
+  }
+
+  get seconds(): number {
+    return this._seconds;
+  }
+
+  set seconds(value: number) {
+    this._seconds = value;
+  }
+
+  get meridian(): MeridianFlag {
+    return this._meridian;
+  }
+
+  set meridian(value: MeridianFlag) {
+    if (String.length > 1 || !["<", ">"].includes(value)) {
+      throw new TypeError("Invalid meridian flag: " + value);
     }
-  }
-
-  getYear(): number {
-    return this._year;
-  }
-
-  setYear(year: number) {
-    this._year = year;
+    this._meridian = value;
   }
 
 }

@@ -5,57 +5,56 @@ describe("UniversalTimestamp", () => {
     expect(() => {const ts = new UniversalTimestamp();}).not.toThrow();
   });
 
-  test("parses", () => {
-    const validTimestamps = [
-      "<---,---,--8,310+---#--:--:--.---", // 13.8 BYA, Big Bang
-      "<---,209,152,000+---#--:--:--.---", // 251.902 MYA, Beginning of Triassic
-      ">000,000,001,983+205#--:--:--.---", // Somebody's Birthday
-      ">000,000,001,969+205#16:50:35.---", // July 24, 1969, 16:50:35 UTC, Apollo 11 Moon landing
-    ];
-
-    const results = [
-      {
-        year: 13_800_000_000,
-        precision: {
-          year: 100_000_000
-        },
-        meridianFlag: "<"
-      },
-      {
-        year: 251_902_000,
-        precision: {
-          year: 1000
-        },
-        meridianFlag: "<"
-      },
-      {
-        year: 1938,
-        precision: {
-          year: 1,
-          day: 1
-        },
-        meridianFlag: ">"
-      },
-      {
-        year: 1969,
-        precision: {
-          year: 1,
-          day: 1,
-          hour: 1,
-          minute: 1,
-          second: 1
-        }
-      }
-    ];
-
-    const timestamps = validTimestamps.map((item) => {
-      const timestamp = new UniversalTimestamp();
-      timestamp.parse(item);
-      return timestamp;
-    });
-
-    timestamps.forEach((item, index) => {
-      expect(item).toMatchObject(results[index]);
-    });
+  test("Parses Billions BC", () => {
+    //13.8 BYA, Big Bang
+    const ts = UniversalTimestamp.parse("<---,---,--8,310+~~~#~~:~~:~~.~~~~");
+    expect(ts.years).toBe(13_800_000_000);
+    expect(ts.precision.year).toBe(100_000_000);
+    expect(ts.meridian).toBe("<");
   });
+
+  test("Parses Millions BC", () => {
+    const ts = UniversalTimestamp.parse("<---,209,152,000+~~~#~~:~~:~~.~~~~");
+    expect(ts.years).toBe(251_902_000);
+    expect(ts.precision.year).toBe(1_000);
+    expect(ts.meridian).toBe("<");
+  });
+
+  test("Parses AD year/day", () => {
+    const ts = UniversalTimestamp.parse(">000,000,001,983+205#~~:~~:~~.~~~~");
+    expect(ts.years).toBe(1_983);
+    expect(ts.days).toBe(205);
+    expect(ts.precision.year).toBe(1);
+    expect(ts.precision.day).toBe(1);
+    expect(ts.meridian).toBe(">");
+  });
+
+  test("Parses AD year/day/hour/minute/second", () => {
+    const ts = UniversalTimestamp.parse(">000,000,001,969+205#16:50:35.~~~~");
+    expect(ts.years).toBe(1969);
+    expect(ts.meridian).toBe(">");
+    expect(ts.hours).toBe(16);
+    expect(ts.minutes).toBe(50);
+    expect(ts.seconds).toBe(35);
+    expect(ts.precision.second).toBe(1);
+  });
+
+  test("Parses AD to hundredth of second", () => {
+    const ts = UniversalTimestamp.parse(">000,000,002,000+359#05:00:02.12~~");
+    expect(ts.seconds).toBe(2.1200);
+    expect(ts.precision.second).toBe(0.01);
+  });
+
+  test("Parses AD to tenth of millisecond", () => {
+    const ts = UniversalTimestamp.parse(">000,000,002,000+359#05:00:02.1234");
+    expect(ts.seconds).toBe(2.1234);
+    expect(ts.precision.second).toBe(0.0001);
+  });
+
+  test("Round-trip parse and toString", () => {
+    const start = "<---,209,152,000+~~~#~~:~~:~~.~~~~";
+    const ts = UniversalTimestamp.parse(start);
+    expect(ts.toString()).toBe(start);
+  });
+
 });

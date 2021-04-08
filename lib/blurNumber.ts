@@ -52,6 +52,9 @@ export default function blurNumber(
 }
 
 function commafy(input:string):string {
+  if (input.length < 4) {
+    return input;
+  }
   const chars = input.split("");
   chars.splice(9, 0, ",");
   chars.splice(6, 0, ",");

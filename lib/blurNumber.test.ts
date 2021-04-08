@@ -15,6 +15,21 @@ test("year with 1 precision", () => {
   expect(blurred).toBe("111,222,333,444");
 });
 
+test("other placeholder char", () => {
+  const blurred = blurNumber(111_222_333_444, 100_000, "-");
+  expect(blurred).toBe("111,222,3--,---");;
+});
+
+test("day with 10 precision", () => {
+  const blurred = blurNumber(123, 10);
+  expect(blurred).toBe("12~");
+});
+
+test("day with 1 precision", () => {
+  const blurred = blurNumber(123, 1);
+  expect(blurred).toBe("123");
+});
+
 test("seconds with 10 precision", () => {
   const blurred = blurNumber("12.3456", 10);
   expect(blurred).toBe("1~.~~~~");
