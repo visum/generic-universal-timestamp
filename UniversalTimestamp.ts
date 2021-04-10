@@ -1,7 +1,7 @@
 import reverse from "./lib/reverse";
-import blurNumber from "./lib/blurNumber";
+import {blurDays, blurSeconds, blurYears} from "./lib/blurNumber";
 
-const regexp = /([<>])([\d~-]{3}),([\d~-]{3}),([\d~-]{3}),([\d~-]{3})\+([\d~-]{3})#([\d~-]{2}):([\d~-]{2}):([\d~-]{2})\.([\d~-]{4})/;
+const regexp = /([<>])([\d~-]{3}),([\d~-]{3}),([\d~-]{3}),([\d~-]{3})\+([\d~-]{3})#([\d~-]{2}):([\d~-]{2}):([\d~-]{2})\.([\d~-]{3})/;
 
 type MeridianFlag = "<" | ">";
 type Precision = {year: number, day: number, hour: number, minute: number, second: number};
@@ -23,6 +23,11 @@ export default class UniversalTimestamp {
       minute: 0,
       second: 0
     };
+    this._years = 0;
+    this._days = 0;
+    this._hours = 0;
+    this._minutes = 0;
+    this._seconds = 0;
   }
 
   static validate(timestamp: UniversalTimestamp): boolean {
@@ -108,14 +113,14 @@ export default class UniversalTimestamp {
   toString(): string {
     // year
     const placeholderChar = this._meridian === "<" ? "-" : "~";
-    let yearString = blurNumber(this._years, this._precision.year, placeholderChar);
+    let yearString = blurYears(this._years, this._precision.year, placeholderChar);
     if (this._meridian === "<") {
       yearString = reverse(yearString);
     }
 
     // day
-    let dayString = blurNumber(this._days, this._precision.day);
-    
+    const dayString = blurDays(this._days, this._precision.day);
+
     // hour
     let hourString = "~~";
     if (this._precision.hour === 1) {
@@ -129,7 +134,7 @@ export default class UniversalTimestamp {
     }
 
     // second
-    let secondString = blurNumber(this._seconds, this._precision.second);
+    const secondString = blurSeconds(this._seconds, this._precision.second);
 
     return `${this._meridian}${yearString}+${dayString}#${hourString}:${minuteString}:${secondString}`;
   }

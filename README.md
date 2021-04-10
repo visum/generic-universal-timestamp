@@ -1,6 +1,6 @@
 # Universal Timestamp
 
-    MYYY,YYY,YYY,YYY+DDD#HH:MM:SS.ssss
+    MYYY,YYY,YYY,YYY+DDD#HH:MM:SS.sss
 
 Where
 
@@ -74,11 +74,10 @@ For example:
 
 | Timestamp                            |  Note        |
 |--------------------------------------|--------------|
-| `>000,000,001,492+013#~~:~~:~~.~~~~` | January 13, 1492, Time unknown |
-| `>000,000,001,969+197#13:31:~~.~~~~` | July 16, 1969 at 13:31 UTC     |
+| `>000,000,001,492+013#~~:~~:~~.~~~` | January 13, 1492, Time unknown |
+| `>000,000,001,969+197#13:31:~~.~~~` | July 16, 1969 at 13:31 UTC     |
 
 The day, hour, minute, and second segements must contain all digits or all placeholders. This
-time segement is invalid: `+10~#1~:4~:2~.~~~`.
+time segement is invalid: `+10~#1~:4~:2~.~~`.
 
 The decimal second segement can have variable precision.
-
