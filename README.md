@@ -16,7 +16,7 @@ Where
 
 The Universal Timestamp should:
 
- * be independent from any other calendaring system
+ * be abstracted from other calendaring systems
  * be easly sortable by ASCII character order
  * be stored as a simple ASCII string
  * represent varying precisions from billions of years to milliseconds 

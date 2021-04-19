@@ -63,4 +63,10 @@ describe("UniversalTimestamp", () => {
     expect(ts.toString()).toBe(start);
   });
 
+  test("toString with hours, minutes < 0", () => {
+    const start = ">000,000,001,969+205#06:01:35.~~~";
+    const ts = UniversalTimestamp.parse(start);
+    expect(ts.toString()).toBe(start);
+  });
+
 });

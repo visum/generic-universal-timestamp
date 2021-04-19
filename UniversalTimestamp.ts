@@ -136,7 +136,7 @@ export default class UniversalTimestamp {
     // second
     const secondString = blurSeconds(this._seconds, this._precision.second);
 
-    return `${this._meridian}${yearString}+${dayString}#${hourString}:${minuteString}:${secondString}`;
+    return `${this._meridian}${yearString}+${dayString}#${hourString.padStart(2, "0")}:${minuteString.padStart(2, "0")}:${secondString}`;
   }
 
   get years(): number {
