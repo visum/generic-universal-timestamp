@@ -28,6 +28,7 @@ export default class UniversalTimestamp {
     this._hours = 0;
     this._minutes = 0;
     this._seconds = 0;
+    this._meridian = ">";
   }
 
   static validate(timestamp: UniversalTimestamp): boolean {
@@ -94,7 +95,7 @@ export default class UniversalTimestamp {
     // fractions of second
     if(timestamp._precision.second !== 0) {
       const milliseconds = matches[10];
-      const msDigits = [];
+      const msDigits: string[] = [];
       ([...milliseconds]).forEach(char => {
         if(char === "~") {
           msDigits.push("0");

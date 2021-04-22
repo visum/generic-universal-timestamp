@@ -12,7 +12,7 @@ import { Calendar } from "./Calendar";
  *     - it is also divisible by 400
  *
  * In the year 1582, day 277 is October 4, day 278 is October 15, and December 31 is day 355
- * 
+ *
  * @TODO: Localizable output
  * @TODO: Timezones: currently, everything is assumed to be in UTC+0
  */
@@ -73,17 +73,17 @@ const daysInMonths = {
 };
 
 export default class Gregorian implements Calendar {
-  _year?: number;
+  _year: number;
   /** 1-12 */
-  _month?: Month;
-  _day?: Day;
-  _hour?: number;
-  _minute?: number;
+  _month: Month | null;
+  _day: Day | null;
+  _hour: number | null;
+  _minute: number | null;
   _timeZoneOffset: number;
-  _second?: string;
+  _second: string | null;
 
   constructor() {
-    this._year = null;
+    this._year = 1;
     this._month = null;
     this._day = null;
     this._hour = null;
@@ -137,13 +137,13 @@ export default class Gregorian implements Calendar {
     this.validateDate();
   }
 
-  get second(): string {
+  get second() {
     return this._second;
   }
 
-  set second(value: string) {
+  set second(value: string | null) {
     if (typeof value === "number") {
-      this._second = value + "";
+      this._second = String(value);
     } else {
       this._second = value;
     }
@@ -159,14 +159,17 @@ export default class Gregorian implements Calendar {
   }
 
   get isLeap(): boolean {
-    if (this.year % 4 === 0) {
-      if (this.year % 100 === 0) {
-        if (this.year % 400 === 0) {
-          return true;
+    if (this.year) {
+      if (this.year % 4 === 0) {
+        if (this.year % 100 === 0) {
+          if (this.year % 400 === 0) {
+            return true;
+          }
+          return false;
         }
-        return false;
+        return true;
       }
-      return true;
+      return false;
     }
     return false;
   }
@@ -187,6 +190,7 @@ export default class Gregorian implements Calendar {
       if (
         this.year === 1582 &&
         this.month === Month.October &&
+        this.day &&
         this.day >= 5 &&
         this.day <= 14
       ) {
@@ -208,18 +212,22 @@ export default class Gregorian implements Calendar {
     }
   }
 
-  getDayOfYear(): number {
+  getDayOfYear(): number | null {
+    if (!this._day || !this._month) {
+      return null;
+    }
+
     const thisDaysInMonths = this.isLeap
       ? daysInMonths.leap
       : daysInMonths.nonLeap;
 
     let dayCounter = 0;
     let thisMonthIndex = 0;
-    while (thisDaysInMonths[thisMonthIndex][0] < this.month) {
+    while (thisDaysInMonths[thisMonthIndex][0] < this._month) {
       dayCounter += thisDaysInMonths[thisMonthIndex][1];
       thisMonthIndex += 1;
     }
-    dayCounter += this.day;
+    dayCounter += this._day;
 
     if (this.year === 1582) {
       // The big adjustment year, where 10 days were dropped in October
@@ -238,12 +246,12 @@ export default class Gregorian implements Calendar {
 
     // This isn't quite right - it won't handle days in October
     // correctly
-    // 
+    //
     // if (this._year === 1582){
     //   thisDaysInMonths = [...thisDaysInMonths];
     //   thisDaysInMonths[9] = [10, 21];
     // }
-    
+
     let daysRemaining = dayOfYear;
     let thisMonthIndex = 0;
 
@@ -301,8 +309,9 @@ export default class Gregorian implements Calendar {
       uts.meridian = ">";
     }
 
-    if (this.month && this.day) {
-      uts.days = this.getDayOfYear();
+    const dayOfYear = this.getDayOfYear();
+    if (dayOfYear !== null) {
+      uts.days = dayOfYear;
       uts.precision.day = 1;
     } else {
       uts.precision.day = 0;
@@ -367,7 +376,7 @@ export default class Gregorian implements Calendar {
       output = `${output} ${String(this.hour).padStart(2, "0")}`;
       if (this.minute !== null) {
         output = `${output}:${String(this.minute).padStart(2, "0")}`;
-        if (this.second !== null) {
+        if (this._second !== null) {
           const [second, subsecond] = this._second.split(".");
           output = `${output}:${second.padStart(2, "0")}.${subsecond}`;
         }
