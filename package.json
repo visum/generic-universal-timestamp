@@ -2,7 +2,7 @@
   "name": "@uhs/universal-timestamp",
   "version": "1.0.0",
   "description": "A variable precision string sortable timestamp representing billions of years down to millisecons",
-  "main": "lib/index.js",
+  "main": "built/index.js",
   "files": [
     "built/*"
   ],
