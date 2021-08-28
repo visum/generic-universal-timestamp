@@ -3,12 +3,13 @@
   "version": "1.0.0",
   "description": "A variable precision string sortable timestamp representing billions of years down to millisecons",
   "main": "built/index.js",
+  "types": "built/index.d.ts",
   "files": [
     "built/*"
   ],
   "scripts": {
     "test": "jest",
-    "build": "tsc"
+    "build": "tsc --declaration"
   },
   "author": "",
   "license": "MIT",
